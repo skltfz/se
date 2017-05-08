@@ -232,6 +232,7 @@
   <ItemGroup>
     <Content Include="kai.xml" />
     <Content Include="snsph.txt" />
+    <Content Include="sql\script.sql" />
     <Content Include="SwiPlCs.XML" />
     <Content Include="a.txt" />
   </ItemGroup>
