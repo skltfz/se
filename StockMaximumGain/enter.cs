@@ -16,10 +16,13 @@ using System.Globalization;
 using System.Diagnostics;
 using StockMaximumGain.classes;
 using Amazon.DynamoDBv2.DocumentModel;
+using StockMaximumGain.Model;
+
 namespace StockMaximumGain
 {
     public partial class enter : Form
     {
+        Bridge efDb = new Bridge();
         writelog wl;
         static int rsiindex = 22;
         db ok = new db();
@@ -36,34 +39,34 @@ namespace StockMaximumGain
                 return sv.InnerText;
             else return "";
         }
-        private List<String> mSplit(String input,char delimiter)
-        {            
+        private List<String> mSplit(String input, char delimiter)
+        {
             int ct = 0;
-            List<String>  ret = new List<String>();            
-            String tmp="";
+            List<String> ret = new List<String>();
+            String tmp = "";
             Boolean escape = false;
             foreach (Char x in input)
             {
-                if(ct!=3)
+                if (ct != 3)
                 {
-                    if(!x.Equals(','))
-                        tmp+=x.ToString();
-                    else 
+                    if (!x.Equals(','))
+                        tmp += x.ToString();
+                    else
                     {
                         ret.Add(tmp);
-                        tmp="";
+                        tmp = "";
                         ct++;
                     }
-                }              
+                }
                 else
                 {
-                    if (x.Equals('"') &&!escape)
+                    if (x.Equals('"') && !escape)
                     {
                         escape = true;
                     }
                     else if (x.Equals('"') && escape)
                     {
-                        escape = false;                        
+                        escape = false;
                     }
                     else
                     {
@@ -83,28 +86,29 @@ namespace StockMaximumGain
                                 ct++;
                             }
                         }
-                    }               
-                }  
+                    }
+                }
             }
             return ret;
         }
         private void enter_Load(object sender, EventArgs e)
         {
-          /*  string x = "Kang Chen <Kang.Chen@wesoft.com>; Kyle Yu <kyle.yu@wesoft.com>; James Li <james.li@wesoft.com>; Kitty Wu <kitty.wu@wesoft.com>; Niya Lu <niya.lu@wesoft.com>";
-            string pattern = "(?<=<).*?(?=>)";               
-            Regex regex = new Regex(pattern, RegexOptions.IgnoreCase); 
-            MatchCollection matches = regex.Matches(util.replaceNewline(x)); 
-            List<String> result = new List<String>();
-            foreach (Match match in matches) 
-            {
-                GroupCollection groups = match.Groups;
-                for (int s = 0; s < groups.Count; s++)
-                {
-                    result.Add(groups[s].Value.Trim());
-                }
-            }
-            foreach(String email in result)
-                MessageBox.Show(email);*/
+          //  bg_Init.RunWorkerAsync();
+            /*  string x = "Kang Chen <Kang.Chen@wesoft.com>; Kyle Yu <kyle.yu@wesoft.com>; James Li <james.li@wesoft.com>; Kitty Wu <kitty.wu@wesoft.com>; Niya Lu <niya.lu@wesoft.com>";
+              string pattern = "(?<=<).*?(?=>)";               
+              Regex regex = new Regex(pattern, RegexOptions.IgnoreCase); 
+              MatchCollection matches = regex.Matches(util.replaceNewline(x)); 
+              List<String> result = new List<String>();
+              foreach (Match match in matches) 
+              {
+                  GroupCollection groups = match.Groups;
+                  for (int s = 0; s < groups.Count; s++)
+                  {
+                      result.Add(groups[s].Value.Trim());
+                  }
+              }
+              foreach(String email in result)
+                  MessageBox.Show(email);*/
             /*string x = " adaptability, assertiveness, diligence, efficiency, emotional stability, initiative, motivation, numeracy, patience, responsible, self-learning";
             string[] xx = x.Split(',');
             List<string> m = new List<string>();            
@@ -120,22 +124,22 @@ namespace StockMaximumGain
 
             }
             MessageBox.Show(res);*/
-          //  Focus w = new Focus();
-          //  w.Show(this);
+            //  Focus w = new Focus();
+            //  w.Show(this);
 
-           /* sym_CB.SelectedIndex = 1;
-            int tmp  = 0;
-            double mux = 240;
-            string x = "";
-            while (tmp < 25)
-            {
-                tmp++;
-                mux *= 1.2;
-                x += " " + mux;
-            }*/
-         //   MessageBox.Show(x);
-        //    wl= new writelog();
-         //   wl.writeentry(0,"bababa");
+            /* sym_CB.SelectedIndex = 1;
+             int tmp  = 0;
+             double mux = 240;
+             string x = "";
+             while (tmp < 25)
+             {
+                 tmp++;
+                 mux *= 1.2;
+                 x += " " + mux;
+             }*/
+            //   MessageBox.Show(x);
+            //    wl= new writelog();
+            //   wl.writeentry(0,"bababa");
             //            rc_RT.Text = "一般外圍市況,\n52week高/52week低,\n 派息時間/數量/原因,\n 保力加通道中位線, \n正/負新聞, \n 買前無論如何都GOOGLE一下";
             refreshg1();
             refreshg2();
@@ -144,10 +148,10 @@ namespace StockMaximumGain
         private void addgrid()
         {
             DataTable x = new DataTable();
-            x = ok.select("distinct type","rsi","","type");
+            x = ok.select("distinct type", "rsi", "", "type");
             List<string> kai = new List<string>();
             foreach (DataRow z in x.Rows)
-            {                
+            {
                 kai.Add(z[0].ToString());
             }
             el_CB.DataSource = kai;
@@ -155,8 +159,8 @@ namespace StockMaximumGain
         private void stock_Btn_Click(object sender, EventArgs e)
         {
             this.Hide();
-           // stock cb = new stock();
-           // cb.ShowDialog(this);
+            // stock cb = new stock();
+            // cb.ShowDialog(this);
 
         }
         public void showoff()
@@ -183,11 +187,11 @@ namespace StockMaximumGain
             cb.ShowDialog(this);
         }
 
-        private double EMA  (double price, double ytdema)
+        private double EMA(double price, double ytdema)
         {
             double tmp = 0;
-            double k = 2/ (rsiindex+1); 
-            tmp = ytdema * (1-k) + price*k;            
+            double k = 2 / (rsiindex + 1);
+            tmp = ytdema * (1 - k) + price * k;
             return tmp;
         }
         private void rsi_Btn_Click(object sender, EventArgs e)
@@ -229,13 +233,13 @@ namespace StockMaximumGain
             }
             catch (Exception ex)
             {
-              //  cf.ShowExceptionErrorMsg("Copy DataGridViw", ex);
+                //  cf.ShowExceptionErrorMsg("Copy DataGridViw", ex);
             }
             return dgv_copy;
         }
 
         private void fillCounter(object sender, DoWorkEventArgs e)
-        {      
+        {
             try
             {
                 SetText(realtimequote.quote(stock_B.Text).ToString());
@@ -245,46 +249,72 @@ namespace StockMaximumGain
             catch (Exception ex)
             {
             }
-/*            while (true)
-            {
+            /*            while (true)
+                        {
 
-                Thread.Sleep(2000);               
-                Process myProcess = new Process();
-                myProcess.StartInfo.UseShellExecute = true;
-                myProcess.StartInfo.FileName = "https://store.apple.com/hk/go/iphone";
-                myProcess.Start();
-            }*/
+                            Thread.Sleep(2000);               
+                            Process myProcess = new Process();
+                            myProcess.StartInfo.UseShellExecute = true;
+                            myProcess.StartInfo.FileName = "https://store.apple.com/hk/go/iphone";
+                            myProcess.Start();
+                        }*/
         }
         private void bgb(object sender, DoWorkEventArgs e)
-        {      
+        {
             db db = new db();
             aws aws = new aws();
+            List<rsi> list = efDb.rsi.ToList();
             DataTable tb = db.powerselect("select stockno,sph from rsi order by stockno");
-//            DataGridView tmp = CopyDataGridView(dgv2);
-            foreach (DataRow x in tb.Rows)
+            //            DataGridView tmp = CopyDataGridView(dgv2);
+            foreach (rsi item in list)
             {
                 int number = 0;
-                int curNumber = x[1]!=null&& x[1].ToString().Length>0? Convert.ToInt32(x[1].ToString()):0;
-                try
-                {                   
-                    number = realtimequote.AAQuote(x[0].ToString()).share;
-                    if (number != curNumber && number > 0)
+                if (item.sph.HasValue)
+                {
+                    int curNumber = item.sph.Value;
+                    try
                     {
-                        db.spowerselect("update rsi set sph = " + number.ToString() + " where stockno =" + x[0].ToString());
-                        List<Vp> hmm = new List<Vp>();
-                        hmm.Add(new Vp("sph", number));
-                        hmm.Add(new Vp("sph2", number));
-                        aws.pullToAWS_ezstockquote(Convert.ToInt32(x[0]), hmm);
-//                        aws.pullToAWS( Convert.ToInt32( x[0].ToString()), number);
+                        //number = realtimequote.AAQuote(item.stockno.ToString()).share;
+                        //if (number != curNumber && number > 0)
+                        //{
+                        //    //db.spowerselect("update rsi set sph = " + number.ToString() + " where stockno =" + x[0].ToString());
+                            List<Vp> hmm = new List<Vp>();
+                            hmm.Add(new Vp("sph", number));
+                            hmm.Add(new Vp("sph2", number));
+                           // aws.pullToAWS_ezstockquote(item.stockno, hmm);
+                        //    //                        aws.pullToAWS( Convert.ToInt32( x[0].ToString()), number);
+                        //}
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-
             }
-            tb = null;
+            //foreach (DataRow x in tb.Rows)
+            //{
+            //    int number = 0;
+            //    int curNumber = x[1] != null && x[1].ToString().Length > 0 ? Convert.ToInt32(x[1].ToString()) : 0;
+            //    try
+            //    {
+            //        number = realtimequote.AAQuote(x[0].ToString()).share;
+            //        if (number != curNumber && number > 0)
+            //        {
+            //            db.spowerselect("update rsi set sph = " + number.ToString() + " where stockno =" + x[0].ToString());
+            //            List<Vp> hmm = new List<Vp>();
+            //            hmm.Add(new Vp("sph", number));
+            //            hmm.Add(new Vp("sph2", number));
+            //            aws.pullToAWS_ezstockquote(Convert.ToInt32(x[0]), hmm);
+            //            //                        aws.pullToAWS( Convert.ToInt32( x[0].ToString()), number);
+            //        }
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        MessageBox.Show(ex.Message);
+            //    }
+
+            //}
+//            tb = null;
             MessageBox.Show("Work Completed. Refreshing now");
             refreshg1();
             refreshg2();
@@ -306,7 +336,7 @@ namespace StockMaximumGain
             #endregion
             foreach (DataRow tutu in trick.Rows)
             {
-                int progress = Convert.ToInt16(100*(no / trick.Rows.Count));
+                int progress = Convert.ToInt16(100 * (no / trick.Rows.Count));
                 no++;
                 bg1.ReportProgress(progress);
                 string lol = "";
@@ -410,32 +440,32 @@ namespace StockMaximumGain
                         }
                         //                        else lol += "\non9\n";
                     }
-                 //   dgv2.DataSource = ret;
+                    //   dgv2.DataSource = ret;
                     #endregion
                     #region updatetable
                     #region AI enhancement
                     if (AI != null)
                     {
-                        foreach(DataRow z in AI.Rows)
+                        foreach (DataRow z in AI.Rows)
                         {
                             if (Convert.ToInt32(answer.ToString()) == Convert.ToInt32(z[0].ToString()))
                             {
                                 for (int y = 0; y < ret.Rows.Count - 1; y++)
                                 {
-                                    if (ok.select("*", "rsihistory", "stockno="+answer.ToString()+ " and "+ "date=" + ok.seb(Convert.ToDateTime(ret.Rows[y][0]).ToShortDateString()), "").Rows.Count > 0)
+                                    if (ok.select("*", "rsihistory", "stockno=" + answer.ToString() + " and " + "date=" + ok.seb(Convert.ToDateTime(ret.Rows[y][0]).ToShortDateString()), "").Rows.Count > 0)
                                     {
-                                        ok.update_free("rsihistory", new object[] { "open","highest","lowest","close","volume" }, new object[] 
+                                        ok.update_free("rsihistory", new object[] { "open", "highest", "lowest", "close", "volume" }, new object[]
                                         { ret.Rows[y][1].ToString(),
   ret.Rows[y][2].ToString(),
   ret.Rows[y][3].ToString(),
   ret.Rows[y][6].ToString(),
-  ret.Rows[y][5].ToString().Replace(",", "") 
+  ret.Rows[y][5].ToString().Replace(",", "")
                                         }
                                         , "stockno=" + answer.ToString() + " and " + "date=" + ok.seb(Convert.ToDateTime(ret.Rows[y][0]).ToShortDateString()));
                                     }
                                     else
                                     {
-                                        ok.insert("rsihistory", new object[] {"stockno", "date","open", "highest", "lowest", "close", "volume" },
+                                        ok.insert("rsihistory", new object[] { "stockno", "date", "open", "highest", "lowest", "close", "volume" },
                                             new object[]
                                             {
                                                 answer.ToString(),
@@ -444,7 +474,7 @@ namespace StockMaximumGain
                                                 ret.Rows[y][2].ToString(),
                                                 ret.Rows[y][3].ToString(),
                                                 ret.Rows[y][6].ToString(),
-                                                ret.Rows[y][5].ToString().Replace(",", "") 
+                                                ret.Rows[y][5].ToString().Replace(",", "")
                                             }
                                             );
                                     }
@@ -480,7 +510,7 @@ namespace StockMaximumGain
                 }
                 catch (Exception ex)
                 {
-                    notwork += answer +  "\t";
+                    notwork += answer + "\t";
                 }
                 try
                 {
@@ -543,12 +573,12 @@ namespace StockMaximumGain
 
                     ok.update("rsi", new object[] { "rsi", "date", "volume", "PE", "ii" }, new object[] { RSI, "'" + DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss") + "'", volume, "'" + pe + "'", "'" + ii + "'" }, "stockno", answer.ToString());
                     #region AI enhancement
-                    if (AI!=null)
-                    {                        
+                    if (AI != null)
+                    {
                         foreach (DataRow t2 in AI.Rows)
-                        {                            
-                            if (Convert.ToInt32( answer.ToString())== Convert.ToInt32(t2[0].ToString()))
-                            {                                
+                        {
+                            if (Convert.ToInt32(answer.ToString()) == Convert.ToInt32(t2[0].ToString()))
+                            {
                                 if (ok.powerselect("select * from rsihistory where date = " + ok.seb(DateTime.Now.ToShortDateString()) + " and stockno=" + answer.ToString()).Rows.Count == 0)
                                     ok.insert("rsihistory", new object[] { "date", "stockno", "rsi" }, new object[] { ok.seb(DateTime.Now.ToShortDateString()), answer.ToString(), RSI });
                                 else
@@ -562,7 +592,7 @@ namespace StockMaximumGain
                 }
                 catch (Exception ex)
                 {
-                    notwork += answer +"\t";
+                    notwork += answer + "\t";
                 }
             }
             MessageBox.Show(notwork);
@@ -575,32 +605,32 @@ namespace StockMaximumGain
             // Set the text.
         }
         private double getEMA(DataTable ret, int upordown) //1 is up, 0 is down
-        {                
-                double UTyema = 0;
-                List<int> sri = new List<int>();
-                int t = 0;
-                int rownumber = 0;
-                foreach (DataRow j in ret.Rows)
+        {
+            double UTyema = 0;
+            List<int> sri = new List<int>();
+            int t = 0;
+            int rownumber = 0;
+            foreach (DataRow j in ret.Rows)
+            {
+                if (t > rsiindex) break;
+                if (Convert.ToInt16(j[7]) == upordown)
                 {
-                    if (t > rsiindex) break;
-                    if (Convert.ToInt16(j[7]) == upordown)
-                    {
-                        sri.Add(t);
-                        UTyema += Convert.ToDouble(j[4]);                        
-                    }
-                    t++;
-                    rownumber++;
+                    sri.Add(t);
+                    UTyema += Convert.ToDouble(j[4]);
                 }
-                UTyema /= rsiindex;
-                string lol = "";
-                foreach (int j in sri) lol += j.ToString() + "\n";
-                for (int j = sri.Count-1; j>=0;j--)
-                {
-                    double price = Convert.ToDouble(ret.Rows[sri[j]][4]);
-                    UTyema = EMA(price, UTyema);
-    //                tmp43+=(sri[j].ToString()+" "+(Convert.ToDouble(ret.Rows[sri[j]][4])).ToString())+"\n";
-                }
-            return UTyema;                                                   
+                t++;
+                rownumber++;
+            }
+            UTyema /= rsiindex;
+            string lol = "";
+            foreach (int j in sri) lol += j.ToString() + "\n";
+            for (int j = sri.Count - 1; j >= 0; j--)
+            {
+                double price = Convert.ToDouble(ret.Rows[sri[j]][4]);
+                UTyema = EMA(price, UTyema);
+                //                tmp43+=(sri[j].ToString()+" "+(Convert.ToDouble(ret.Rows[sri[j]][4])).ToString())+"\n";
+            }
+            return UTyema;
         }
         public void q1stock(int stockno)
         {
@@ -627,7 +657,7 @@ namespace StockMaximumGain
             StreamReader vr = new StreamReader(response.GetResponseStream());
             string result = vr.ReadToEnd();
             string pattern = "(?<=調整後的收市價\\*.*?</th></tr>).*?(?=\\* <small>收市價已按股息和拆細而調整)";//god append                
-//                   pattern = "(?<=<span class=\"time_rtq_ticker\">).*?(?=</span>)";//god append                
+                                                                                           //                   pattern = "(?<=<span class=\"time_rtq_ticker\">).*?(?=</span>)";//god append                
             Regex regex = new Regex(pattern, RegexOptions.IgnoreCase); // 宣告 Regex 忽略大小寫
             MatchCollection matches = regex.Matches(util.replaceNewline(result)); // 將比對後集合傳給 MatchCollection
             string lol = "";
@@ -828,10 +858,10 @@ namespace StockMaximumGain
                     break;
                     //                lol+= ++index + ": " + groups["word"].Value.Trim();
                 }
-                infl = Convert.ToDouble(lol) * volume;               
+                infl = Convert.ToDouble(lol) * volume;
                 #endregion
 
-                ok.update("rsi", new object[] { "rsi", "date", "volume", "PE", "ii","infl" }, new object[] { RSI, "'" + DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss") + "'", volume, "'" + pe + "'", "'" + ii + "'" ,"'"+infl+"'"}, "stockno", answer.ToString());
+                ok.update("rsi", new object[] { "rsi", "date", "volume", "PE", "ii", "infl" }, new object[] { RSI, "'" + DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss") + "'", volume, "'" + pe + "'", "'" + ii + "'", "'" + infl + "'" }, "stockno", answer.ToString());
 
                 #endregion
                 done += answer + "\t";
@@ -846,30 +876,30 @@ namespace StockMaximumGain
             //}
         }
         private void gethsi()
-        {            
+        {
             foreach (DataRow tmplistitem in ok.select("*", "indexlist", "indexname = 'hsi'", "").Rows)
             {
                 string done = "";
-            string notwork = "";
-            DataTable ret = new DataTable();
-            ret.Columns.Add("date");
-            ret.Columns.Add("open");
-            ret.Columns.Add("highest");
-            ret.Columns.Add("lowest");
-            ret.Columns.Add("closure");
-            ret.Columns.Add("volume");
-            ret.Columns.Add("adjusted");
-            ret.Columns.Add("uod");
-            string threeROllrl = tmplistitem[0].ToString(); //usa
-            WebRequest request = HttpWebRequest.Create(threeROllrl);
-            WebResponse response = request.GetResponse();
-            StreamReader vr = new StreamReader(response.GetResponseStream());
-            string result = vr.ReadToEnd();
-            string pattern = "(?<=調整後的收市價\\*.*?</th></tr>).*?(?=\\* <small>收市價已按股息和拆細而調整)";//god append                
-            Regex regex = new Regex(pattern, RegexOptions.IgnoreCase); // 宣告 Regex 忽略大小寫
-            MatchCollection matches = regex.Matches(util.replaceNewline(result)); // 將比對後集合傳給 MatchCollection
-            string lol = "";
-            double RSI = 0;            
+                string notwork = "";
+                DataTable ret = new DataTable();
+                ret.Columns.Add("date");
+                ret.Columns.Add("open");
+                ret.Columns.Add("highest");
+                ret.Columns.Add("lowest");
+                ret.Columns.Add("closure");
+                ret.Columns.Add("volume");
+                ret.Columns.Add("adjusted");
+                ret.Columns.Add("uod");
+                string threeROllrl = tmplistitem[0].ToString(); //usa
+                WebRequest request = HttpWebRequest.Create(threeROllrl);
+                WebResponse response = request.GetResponse();
+                StreamReader vr = new StreamReader(response.GetResponseStream());
+                string result = vr.ReadToEnd();
+                string pattern = "(?<=調整後的收市價\\*.*?</th></tr>).*?(?=\\* <small>收市價已按股息和拆細而調整)";//god append                
+                Regex regex = new Regex(pattern, RegexOptions.IgnoreCase); // 宣告 Regex 忽略大小寫
+                MatchCollection matches = regex.Matches(util.replaceNewline(result)); // 將比對後集合傳給 MatchCollection
+                string lol = "";
+                double RSI = 0;
                 #region got the table
                 #region reinitialization
                 DataRow tmp = ret.NewRow();
@@ -944,19 +974,19 @@ namespace StockMaximumGain
                 #endregion
                 foreach (DataRow tmprow in ret.Rows)
                 {
-                    if (ok.select("date",tmplistitem[1].ToString(), "date=" + ok.seb( Convert.ToDateTime(tmprow[0].ToString()).ToShortDateString()), "").Rows.Count > 0)
+                    if (ok.select("date", tmplistitem[1].ToString(), "date=" + ok.seb(Convert.ToDateTime(tmprow[0].ToString()).ToShortDateString()), "").Rows.Count > 0)
                     {
-                        ok.update_free(tmplistitem[1].ToString(), new object[] { "open", "highest", "lowest", "closeure", "volume" }, new object[] 
+                        ok.update_free(tmplistitem[1].ToString(), new object[] { "open", "highest", "lowest", "closeure", "volume" }, new object[]
                         {Convert.ToDouble(tmprow[1]).ToString(),
                             Convert.ToDouble(tmprow[2]).ToString(),
                             Convert.ToDouble(tmprow[3]).ToString(),
                             Convert.ToDouble(tmprow[4]).ToString(),
-                            Convert.ToDouble(tmprow[5]).ToString() 
+                            Convert.ToDouble(tmprow[5]).ToString()
                         }, "date =" + ok.seb(Convert.ToDateTime(tmprow[0]).ToShortDateString()));
                     }
                     else
                     {
-                        ok.insert(tmplistitem[1].ToString(), new object[] { "date","open", "highest", "lowest", "closeure", "volume" }, new object[] { 
+                        ok.insert(tmplistitem[1].ToString(), new object[] { "date", "open", "highest", "lowest", "closeure", "volume" }, new object[] {
                             ok.seb( Convert.ToDateTime(tmprow[0]).ToShortDateString()),
                             Convert.ToDouble(tmprow[1]).ToString(),
                             Convert.ToDouble(tmprow[2]).ToString(),
@@ -966,16 +996,16 @@ namespace StockMaximumGain
                         });
                     }
                 }
-               // dgv2.DataSource = ret;
+                // dgv2.DataSource = ret;
             }
-        
+
         }
         private void srsi_B_Click(object sender, EventArgs e)
         {
             //gethsi();
             //return;
-            if(!stock_B.Text.Equals(""))
-            q1stock(Convert.ToInt32(stock_B.Text));
+            if (!stock_B.Text.Equals(""))
+                q1stock(Convert.ToInt32(stock_B.Text));
         }
 
         private void ignore_Btn_Click(object sender, EventArgs e)
@@ -996,7 +1026,7 @@ namespace StockMaximumGain
                     break;
                 }
             }
-            DataTable x = ok.select("stockno","rsi","type='"+ type_B.Text+"'","");
+            DataTable x = ok.select("stockno", "rsi", "type='" + type_B.Text + "'", "");
             foreach (DataRow v in x.Rows)
             {
                 string stockno = v[0].ToString();
@@ -1005,10 +1035,10 @@ namespace StockMaximumGain
                 {
                     //System.Diagnostics.Process.Start("http://www.aastocks.com/tc/stock/detailchart.aspx?symbol=" + stockno + "#GTop");
                     System.Diagnostics.Process.Start("http://money18.on.cc/info/liveinfo_quote.html?symbol=" + stockno);
-                    Thread.Sleep(400);                    
-//                    string datefrom = DateTime.Now.AddMonths(-12).Year.ToString() + DateTime.Now.AddMonths(-12).Month.ToString().PadLeft(2, '0') + DateTime.Now.AddMonths(-12).Day.ToString().PadLeft(2, '0');
-//                    string dateto = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString().PadLeft(2, '0') + DateTime.Now.Day.ToString().PadLeft(2, '0');
-//                    System.Diagnostics.Process.Start("http://corpsv.etnet.com.hk/webservice/jsp/ETNET/DIV-ANNOUNCE/BIG5/SearchResult.jsp?SORT=CODE&TO=" + dateto + "&ENCODING=BIG5&ANNOUNCETYPE=D&STOCKCODE=" + stockno + "&MAINTYPE=DIVANNOUNCE&FROM=" + datefrom + "&INDUSTRY=&SUBTYPE=SEARCH&CLIENT=ETNET");
+                    Thread.Sleep(400);
+                    //                    string datefrom = DateTime.Now.AddMonths(-12).Year.ToString() + DateTime.Now.AddMonths(-12).Month.ToString().PadLeft(2, '0') + DateTime.Now.AddMonths(-12).Day.ToString().PadLeft(2, '0');
+                    //                    string dateto = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString().PadLeft(2, '0') + DateTime.Now.Day.ToString().PadLeft(2, '0');
+                    //                    System.Diagnostics.Process.Start("http://corpsv.etnet.com.hk/webservice/jsp/ETNET/DIV-ANNOUNCE/BIG5/SearchResult.jsp?SORT=CODE&TO=" + dateto + "&ENCODING=BIG5&ANNOUNCETYPE=D&STOCKCODE=" + stockno + "&MAINTYPE=DIVANNOUNCE&FROM=" + datefrom + "&INDUSTRY=&SUBTYPE=SEARCH&CLIENT=ETNET");
                 }
             }
         }
@@ -1020,7 +1050,7 @@ namespace StockMaximumGain
 
         private void pe_Btn_Click(object sender, EventArgs e)
         {
-            ok.insert("remarks", new object[] { "date", "remarks", "removestamp" }, new object[] { "'" + DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss") + "'", "'" + remarks_RB.Text + "'", "'"+ DateTime.Now.Day.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString()+"'" });
+            ok.insert("remarks", new object[] { "date", "remarks", "removestamp" }, new object[] { "'" + DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss") + "'", "'" + remarks_RB.Text + "'", "'" + DateTime.Now.Day.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + "'" });
             refreshg1();
 
         }
@@ -1052,7 +1082,7 @@ namespace StockMaximumGain
             {
             }
         }
-          
+
         private void stock_B_TextChanged(object sender, EventArgs e)
         {
             string g = stock_B.Text;
@@ -1078,19 +1108,44 @@ namespace StockMaximumGain
         }
         private void promptNet(string x)
         {
-                
+
+            double Num = 0;
+            if (Double.TryParse(x.ToString(), out Num))
+            {
+                //                        if (MessageBox.Show("Edit the remarks now?","Hello", MessageBoxButtons.YesNo) == DialogResult.No)
+                //                        {
+                System.Diagnostics.Process.Start("http://www.sl886.com/p/stock?c=" + x.ToString());
+                Thread.Sleep(400);
+                System.Diagnostics.Process.Start("http://money18.on.cc/info/liveinfo_quote.html?symbol=" + x.ToString());
+                string datefrom = DateTime.Now.AddMonths(-12).Year.ToString() + DateTime.Now.AddMonths(-12).Month.ToString().PadLeft(2, '0') + DateTime.Now.AddMonths(-12).Day.ToString().PadLeft(2, '0');
+                string dateto = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString().PadLeft(2, '0') + DateTime.Now.Day.ToString().PadLeft(2, '0');
+                System.Diagnostics.Process.Start("http://corpsv.etnet.com.hk/webservice/jsp/ETNET/DIV-ANNOUNCE/BIG5/SearchResult.jsp?SORT=CODE&TO=" + dateto + "&ENCODING=BIG5&ANNOUNCETYPE=D&STOCKCODE=" + x.ToString() + "&MAINTYPE=DIVANNOUNCE&FROM=" + datefrom + "&INDUSTRY=&SUBTYPE=SEARCH&CLIENT=ETNET");
+                System.Diagnostics.Process.Start("http://www.aastocks.com/tc/stock/detailchart.aspx?symbol=" + x.ToString() + "#GTop");
+                /*                        }
+                                        else
+                                        {
+                                            stockremarks sr = new stockremarks(Convert.ToInt32(g.Value.ToString()));
+                                            sr.Show();
+                                        }*/
+            }
+        }
+        private void promptNet()
+        {
+            DataGridViewSelectedCellCollection x = dgv2.SelectedCells;
+            foreach (DataGridViewCell g in x)
+            {
                 double Num = 0;
-                if (Double.TryParse(x.ToString(), out Num))
+                if (Double.TryParse(g.Value.ToString(), out Num) && g.ColumnIndex == 0)
                 {
                     //                        if (MessageBox.Show("Edit the remarks now?","Hello", MessageBoxButtons.YesNo) == DialogResult.No)
                     //                        {
-                    System.Diagnostics.Process.Start("http://www.sl886.com/p/stock?c=" + x.ToString());
+                    System.Diagnostics.Process.Start("http://www.sl886.com/p/stock?c=" + g.Value.ToString());
                     Thread.Sleep(400);
-                    System.Diagnostics.Process.Start("http://money18.on.cc/info/liveinfo_quote.html?symbol=" + x.ToString());
+                    System.Diagnostics.Process.Start("http://money18.on.cc/info/liveinfo_quote.html?symbol=" + g.Value.ToString());
                     string datefrom = DateTime.Now.AddMonths(-12).Year.ToString() + DateTime.Now.AddMonths(-12).Month.ToString().PadLeft(2, '0') + DateTime.Now.AddMonths(-12).Day.ToString().PadLeft(2, '0');
                     string dateto = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString().PadLeft(2, '0') + DateTime.Now.Day.ToString().PadLeft(2, '0');
-                    System.Diagnostics.Process.Start("http://corpsv.etnet.com.hk/webservice/jsp/ETNET/DIV-ANNOUNCE/BIG5/SearchResult.jsp?SORT=CODE&TO=" + dateto + "&ENCODING=BIG5&ANNOUNCETYPE=D&STOCKCODE=" + x.ToString() + "&MAINTYPE=DIVANNOUNCE&FROM=" + datefrom + "&INDUSTRY=&SUBTYPE=SEARCH&CLIENT=ETNET");
-                    System.Diagnostics.Process.Start("http://www.aastocks.com/tc/stock/detailchart.aspx?symbol=" + x.ToString() + "#GTop");
+                    System.Diagnostics.Process.Start("http://corpsv.etnet.com.hk/webservice/jsp/ETNET/DIV-ANNOUNCE/BIG5/SearchResult.jsp?SORT=CODE&TO=" + dateto + "&ENCODING=BIG5&ANNOUNCETYPE=D&STOCKCODE=" + g.Value.ToString() + "&MAINTYPE=DIVANNOUNCE&FROM=" + datefrom + "&INDUSTRY=&SUBTYPE=SEARCH&CLIENT=ETNET");
+                    System.Diagnostics.Process.Start("http://www.aastocks.com/tc/stock/detailchart.aspx?symbol=" + g.Value.ToString() + "#GTop");
                     /*                        }
                                             else
                                             {
@@ -1098,32 +1153,7 @@ namespace StockMaximumGain
                                                 sr.Show();
                                             }*/
                 }
-        }
-        private void promptNet()
-        {
-            DataGridViewSelectedCellCollection x = dgv2.SelectedCells;            
-                foreach (DataGridViewCell g in x)
-                {
-                    double Num = 0;
-                    if (Double.TryParse(g.Value.ToString(), out Num) && g.ColumnIndex == 0)
-                    {
-//                        if (MessageBox.Show("Edit the remarks now?","Hello", MessageBoxButtons.YesNo) == DialogResult.No)
-//                        {
-                            System.Diagnostics.Process.Start("http://www.sl886.com/p/stock?c=" + g.Value.ToString());
-                            Thread.Sleep(400);
-                            System.Diagnostics.Process.Start("http://money18.on.cc/info/liveinfo_quote.html?symbol=" + g.Value.ToString());
-                            string datefrom = DateTime.Now.AddMonths(-12).Year.ToString() + DateTime.Now.AddMonths(-12).Month.ToString().PadLeft(2, '0') + DateTime.Now.AddMonths(-12).Day.ToString().PadLeft(2, '0');
-                            string dateto = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString().PadLeft(2, '0') + DateTime.Now.Day.ToString().PadLeft(2, '0');
-                            System.Diagnostics.Process.Start("http://corpsv.etnet.com.hk/webservice/jsp/ETNET/DIV-ANNOUNCE/BIG5/SearchResult.jsp?SORT=CODE&TO=" + dateto + "&ENCODING=BIG5&ANNOUNCETYPE=D&STOCKCODE=" + g.Value.ToString() + "&MAINTYPE=DIVANNOUNCE&FROM=" + datefrom + "&INDUSTRY=&SUBTYPE=SEARCH&CLIENT=ETNET");
-                            System.Diagnostics.Process.Start("http://www.aastocks.com/tc/stock/detailchart.aspx?symbol=" + g.Value.ToString() + "#GTop");
-/*                        }
-                        else
-                        {
-                            stockremarks sr = new stockremarks(Convert.ToInt32(g.Value.ToString()));
-                            sr.Show();
-                        }*/
-                    }
-                }
+            }
         }
         private void stock_B_KeyDown(object sender, KeyEventArgs e)
         {
@@ -1139,7 +1169,7 @@ namespace StockMaximumGain
             }
             if (e.KeyCode == Keys.Enter)
             {
-                DataTable dbt = db.spowerselect("select COUNT(1) from rsi where stockno  = "+ stock_B.Text);
+                DataTable dbt = db.spowerselect("select COUNT(1) from rsi where stockno  = " + stock_B.Text);
                 if (Convert.ToInt16(dbt.Rows[0][0]) == 0)
                 {
                     db.spowerselect("insert into rsi (name,stockno) VALUES ('" + stock_B.Text + "'," + stock_B.Text + ")");
@@ -1147,7 +1177,7 @@ namespace StockMaximumGain
                 }
                 promptNet(stock_B.Text);
             }
-        }       
+        }
         private void dgv1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             try
@@ -1155,7 +1185,7 @@ namespace StockMaximumGain
                 DataGridViewSelectedCellCollection x = dgv1.SelectedCells;
                 foreach (DataGridViewCell g in x)
                 {
-                    if (g.ColumnIndex==2 && isNumeric(g.Value.ToString()))
+                    if (g.ColumnIndex == 2 && isNumeric(g.Value.ToString()))
                     {
                         if (MessageBox.Show("Remove remarks:" + g.Value.ToString() + "?", "Confirm", MessageBoxButtons.YesNo) == DialogResult.Yes)
                         {
@@ -1208,7 +1238,7 @@ namespace StockMaximumGain
 
         private void type_B_TextChanged(object sender, EventArgs e)
         {
- 
+
         }
 
         private void searchType_Btn_Click(object sender, EventArgs e)
@@ -1219,10 +1249,10 @@ namespace StockMaximumGain
             {
                 if (dgv2.Rows[xx].Cells[2].Value.ToString().Equals(g))
                 {
-                    dgv2.CurrentCell = dgv2.Rows[xx].Cells[2];                    
+                    dgv2.CurrentCell = dgv2.Rows[xx].Cells[2];
                     break;
                 }
-            }            
+            }
         }
 
         private void ans_Btn_Click(object sender, EventArgs e)
@@ -1231,11 +1261,11 @@ namespace StockMaximumGain
             WebRequest request = null;
             WebResponse response = null;
             Regex regex = null;
-            MatchCollection matches;            
+            MatchCollection matches;
             string threeROllrl = "http://www.etnet.com.hk/www/tc/stocks/ci_ipo.php";
             request = HttpWebRequest.Create(threeROllrl);
             response = request.GetResponse();
-            vr = new StreamReader(response.GetResponseStream());           
+            vr = new StreamReader(response.GetResponseStream());
             string result = vr.ReadToEnd();
             ///pattern = "(?<=調整後的收市價\\*.*?</th></tr>).*?(?=\\* <small>收市價已按股息和拆細而調整)";//god append                
             //remarks_RB.Text = result;
@@ -1254,12 +1284,12 @@ namespace StockMaximumGain
             pattern = "(?<=<tr .{5,20}?\">).{0,650}?(?=</tr>)";
             regex = new Regex(pattern, RegexOptions.IgnoreCase); // 宣告 Regex 忽略大小寫
             matches = regex.Matches(util.replaceNewline(wiw)); // 將比對後集合傳給 MatchCollection
-            string log= "";
+            string log = "";
             string dmasql = "-----------------Report-----------------\n";
             foreach (Match match in matches) // fetch the table by tr
             {
                 string stockno = "";
-                string stockname ="";
+                string stockname = "";
                 GroupCollection groups = match.Groups;
                 for (int s = 0; s < groups.Count; s++) // fetch the table by tr
                 {
@@ -1300,17 +1330,17 @@ namespace StockMaximumGain
                         else
                         {
                             log += stockno + ":" + stockname + " is exist.\n";
-                            dmasql += "select * from rsi where stockno =" +ok.seb(stockno)+ "\n"; 
+                            dmasql += "select * from rsi where stockno =" + ok.seb(stockno) + "\n";
                         }
 
                     }
                     #endregion
                 }
             }
-            if(!log.Equals(""))
+            if (!log.Equals(""))
                 MessageBox.Show(log);
-            if(!dmasql.Equals("")) MessageBox.Show(dmasql);
-            
+            if (!dmasql.Equals("")) MessageBox.Show(dmasql);
+
             return;
             //XmlDocument res = new XmlDocument();
             //res.LoadXml(ss);           
@@ -1334,12 +1364,12 @@ namespace StockMaximumGain
             pattern x = null;
             try
             {
-                 x = new pattern(Convert.ToInt32(stock_B.Text));
+                x = new pattern(Convert.ToInt32(stock_B.Text));
 
             }
             catch (Exception ex)
             {
-                 x = new pattern(17);
+                x = new pattern(17);
             }
             x.ShowDialog(this);
 
@@ -1373,32 +1403,32 @@ namespace StockMaximumGain
 
         private void hsbc_Btn_Click(object sender, EventArgs e)
         {
-          
-            System.Diagnostics.Process.Start("https://www.ebanking.hsbc.com.hk/1/2/logon?LANGTAG=en&COUNTRYTAG=US&fbc=HomeEngLeftMenu");                           
+
+            System.Diagnostics.Process.Start("https://www.ebanking.hsbc.com.hk/1/2/logon?LANGTAG=en&COUNTRYTAG=US&fbc=HomeEngLeftMenu");
         }
 
         private void zzBtn_Click(object sender, EventArgs e)
         {
             Boolean findres = true;
-           /* try{
-            foreach (DataGridViewRow x in dgv2.Rows)                
-            {
-                if (x.Cells[0].Value.ToString().Equals(stock_B.Text))
-                {
-                    quan = Convert.ToDouble(x.Cells[8].Value.ToString());
-                    findres= true;
-                    break;
-                }
-            }
-            }
-            catch(Exception ex) {MessageBox.Show("Cannot parse the quantity");}*/
+            /* try{
+             foreach (DataGridViewRow x in dgv2.Rows)                
+             {
+                 if (x.Cells[0].Value.ToString().Equals(stock_B.Text))
+                 {
+                     quan = Convert.ToDouble(x.Cells[8].Value.ToString());
+                     findres= true;
+                     break;
+                 }
+             }
+             }
+             catch(Exception ex) {MessageBox.Show("Cannot parse the quantity");}*/
             if (!findres) return;
             try
             {
                 double pi = Convert.ToDouble(pi_B.Text);
                 int share = Convert.ToInt32(si_B.Text);
-                int lot =  Convert.ToInt32(li_B.Text);
-                ci_B.Text = stock.buy(pi, share , lot).ToString();
+                int lot = Convert.ToInt32(li_B.Text);
+                ci_B.Text = stock.buy(pi, share, lot).ToString();
             }
             catch (Exception ex)
             {
@@ -1411,19 +1441,19 @@ namespace StockMaximumGain
                 double po = Convert.ToDouble(po_B.Text);
                 int share = Convert.ToInt32(so_B.Text);
                 int lot = Convert.ToInt32(lo_B.Text);
-                co_B.Text = stock.sell(po, share,lot).ToString();
+                co_B.Text = stock.sell(po, share, lot).ToString();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 co_B.Text = "N/A";
                 findres = false;
             }
             if (findres)
             {
-                double vrse =Convert.ToDouble(co_B.Text)- Convert.ToDouble(ci_B.Text) ;
+                double vrse = Convert.ToDouble(co_B.Text) - Convert.ToDouble(ci_B.Text);
                 calR_B.Text = vrse.ToString();
-                if(vrse>0) calR_B.BackColor= Color.Green;
-                else calR_B.BackColor= Color.Gray;
+                if (vrse > 0) calR_B.BackColor = Color.Green;
+                else calR_B.BackColor = Color.Gray;
             }
             /**/
         }
@@ -1431,10 +1461,10 @@ namespace StockMaximumGain
         private void v1v2_cal(object sender, EventArgs e)
         {
             if (v1_B.Text.Equals("") || v2_B.Text.Equals("")) return;
-            switch(sym_CB.SelectedIndex)
+            switch (sym_CB.SelectedIndex)
             {
                 case 0:
-                    res_L.Text =( Convert.ToDouble(v1_B.Text) + Convert.ToDouble(v2_B.Text)).ToString();
+                    res_L.Text = (Convert.ToDouble(v1_B.Text) + Convert.ToDouble(v2_B.Text)).ToString();
                     break;
                 case 1:
                     res_L.Text = (Convert.ToDouble(v1_B.Text) - Convert.ToDouble(v2_B.Text)).ToString();
@@ -1446,8 +1476,8 @@ namespace StockMaximumGain
         private void dgv2_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == 8)
-                db.spowerselect("update rsi set sph = " + (dgv2.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString().Equals("")?"null":dgv2.Rows[e.RowIndex].Cells[e.ColumnIndex].Value) + " where stockno =" + dgv2.Rows[e.RowIndex].Cells[0].Value);
-            else if (e.ColumnIndex==1)
+                db.spowerselect("update rsi set sph = " + (dgv2.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString().Equals("") ? "null" : dgv2.Rows[e.RowIndex].Cells[e.ColumnIndex].Value) + " where stockno =" + dgv2.Rows[e.RowIndex].Cells[0].Value);
+            else if (e.ColumnIndex == 1)
                 db.spowerselect("update rsi set name = " + db.sseb(dgv2.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString()) + " where stockno =" + dgv2.Rows[e.RowIndex].Cells[0].Value);
 
         }
@@ -1461,7 +1491,7 @@ namespace StockMaximumGain
         {
             try
             {
-                if (po_B.Text.Equals("") ||Convert.ToDouble(po_B.Text) < Convert.ToDouble(pi_B.Text))
+                if (po_B.Text.Equals("") || Convert.ToDouble(po_B.Text) < Convert.ToDouble(pi_B.Text))
                     po_B.Text = pi_B.Text;
             }
             catch (Exception ex)
@@ -1495,7 +1525,7 @@ namespace StockMaximumGain
             else
             {
                 this.pi_B.Text = text;
-            }            
+            }
         }
         delegate void SetTextCallbackB(string text);
         private void SetTextB(string share)
@@ -1546,9 +1576,9 @@ namespace StockMaximumGain
                     }
                 }
                 initDay--;
-            } while (!found );
+            } while (!found);
         }
-        
+
         private void ci_B_TextChanged(object sender, EventArgs e)
         {
 
@@ -1578,7 +1608,7 @@ namespace StockMaximumGain
             //support amazon dynamodb
             try
             {
-                              bgbb.RunWorkerAsync();                
+                bgbb.RunWorkerAsync();
             }
             catch (Exception ex)
             {
@@ -1595,6 +1625,29 @@ namespace StockMaximumGain
         {
             Focus w = new Focus();
             w.Show(this);
+        }
+
+        private void bg_Init_DoWork(object sender, DoWorkEventArgs e)
+        {
+            stock.PushToDBFromHKEX(this);
+            refreshg1();
+            refreshg2();
+            addgrid();
+            writeToTextbox("All");
+        }
+        delegate void UpdateLabel(string result);
+        //...
+        public void writeToTextbox(string fCounter)
+        {
+            if (this.InvokeRequired)
+            {
+                UpdateLabel textWriter = new UpdateLabel(writeToTextbox);
+                this.Invoke(textWriter, new object[] { fCounter });
+            }
+            else
+            {
+                result_L.Text = string.Format("{0} : Done", fCounter);
+            }
         }
     }
 }

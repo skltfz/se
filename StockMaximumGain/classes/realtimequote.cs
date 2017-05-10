@@ -12,26 +12,29 @@ namespace StockMaximumGain.classes
     class realtimequote
     {
         //<td class="font12_grey">每手股數</td> 
-//                                            <td class="font12 R">400</td>
+        //                                            <td class="font12 R">400</td>
 
         //http://www.aastocks.com/tc/Stock/BasicQuote.aspx?Symbol=0005
         public static double quote(string no)
         {
             string threeROllrl = "http://hk.finance.yahoo.com/q/hp?s=" + no.ToString().PadLeft(4, '0') + ".HK";
+            threeROllrl = string.Format("https://hk.finance.yahoo.com/quote/{0}.HK/", no.ToString().PadLeft(4, '0'));
             WebRequest request = HttpWebRequest.Create(threeROllrl);
             WebResponse response = request.GetResponse();
             StreamReader vr = new StreamReader(response.GetResponseStream());
             string result = vr.ReadToEnd();
-            string pattern = "(?<=調整後的收市價\\*.*?</th></tr>).*?(?=\\* <small>收市價已按股息和拆細而調整)";//god append                
-                   pattern = "(?<=<span class=\"time_rtq_ticker\">).*?(?=</span>)";//god append                
+            string pattern = "(?<=調整後的收市價\\*.*?</th></tr>).*?(?=\\* <small>收市價已按股息和拆細而調整)";//god append      
+            //Trsdu(0.3s) Fw(b) Fz(36px) Mb(-4px) D(ib)          
+            pattern = "(?<=<span class=\"Trsdu\\(.{0,7}?\\) Fw\\(.{0,7}?\\) Fz\\(.{0,7}?\\) Mb\\(.{0,7}?\\) D\\(.{0,7}?\\).{10,60}?>).{0,20}?(?=</span>)";//god append    
+                                       //Trsdu(0.3s) Fw(b) Fz(36px) Mb(-4px) D(ib)
+            //(?<=<table class=\"table_grey_border\" width=\"100%\" cellspacing=\"2\" cellpadding=\"0\">).*?(?=</table>)            
             Regex regex = new Regex(pattern, RegexOptions.IgnoreCase); // 宣告 Regex 忽略大小寫
+            //<span class="Trsdu(0.3s) Fw(b) Fz(36px) Mb(-4px) D(ib)" data-reactid="36">3.75</span>
             MatchCollection matches = regex.Matches(util.replaceNewline(result)); // 將比對後集合傳給 MatchCollection
             string lol = "";
             double RSI = 0;
             try
             {
-                #region reinitialization   
-                #endregion
                 foreach (Match match in matches) // 一一取出 MatchCollection 內容
                 {
                     // 將 Match 內所有值的集合傳給 GroupCollection groups
@@ -64,7 +67,7 @@ namespace StockMaximumGain.classes
             MatchCollection matches;
             StreamReader vr = null;
             string pattern;
-            string lol ="";
+            string lol = "";
             string result = "";
             DataTable ret = new DataTable();
             ret.Columns.Add("date");
@@ -105,57 +108,57 @@ namespace StockMaximumGain.classes
             int cl = 0;
             tmp = ret.NewRow();
             #endregion
-            for (int q = 0; q < (matches.Count>focus.reCnt?focus.reCnt:matches.Count)/*matches.Count*/; q++)
-//                foreach (Match match in matches) // 一一取出 MatchCollection 內容
+            for (int q = 0; q < (matches.Count > focus.reCnt ? focus.reCnt : matches.Count)/*matches.Count*/; q++)
+            //                foreach (Match match in matches) // 一一取出 MatchCollection 內容
             {
                 Match match = matches[q];
-                    if (match.Length > 0)
+                if (match.Length > 0)
+                {
+                    // 將 Match 內所有值的集合傳給 GroupCollection groups
+                    GroupCollection groups = match.Groups;
+                    // 印出 Group 內 word 值
+                    for (int s = 0; s < groups.Count; s++)
                     {
-                        // 將 Match 內所有值的集合傳給 GroupCollection groups
-                        GroupCollection groups = match.Groups;
-                        // 印出 Group 內 word 值
-                        for (int s = 0; s < groups.Count; s++)
+                        pattern = "(?<=<td.*?>).{1,35}?(?=</td>)";//god append                
+                        string extractedrows = lol;
+                        //remarks_RB.Text = extracted;
+                        //<tr><td class="yfnc_tabledata1" nowrap align="right">2013年4月5日</td>
+                        //<td class="yfnc_tabledata1" align="center" colspan="6">1:            10 股票分拆</td></tr><
+                        regex = new Regex(pattern, RegexOptions.IgnoreCase); // 宣告 Regex 忽略大小寫                            
+                        MatchCollection mat2 = regex.Matches(replaceNewline(groups[s].Value.Trim()));
+                        if (mat2.Count > 2)
                         {
-                            pattern = "(?<=<td.*?>).{1,35}?(?=</td>)";//god append                
-                            string extractedrows = lol;
-                            //remarks_RB.Text = extracted;
-                            //<tr><td class="yfnc_tabledata1" nowrap align="right">2013年4月5日</td>
-                            //<td class="yfnc_tabledata1" align="center" colspan="6">1:            10 股票分拆</td></tr><
-                            regex = new Regex(pattern, RegexOptions.IgnoreCase); // 宣告 Regex 忽略大小寫                            
-                            MatchCollection mat2 = regex.Matches(replaceNewline(groups[s].Value.Trim()));
-                            if (mat2.Count > 2)
+                            foreach (Match mat in mat2) // 一一取出 MatchCollection 內容
                             {
-                                foreach (Match mat in mat2) // 一一取出 MatchCollection 內容
+                                // 將 Match 內所有值的集合傳給 GroupCollection groups
+                                GroupCollection gps = mat.Groups;
+                                // 印出 Group 內 word 值
+                                for (int m = 0; m < gps.Count; m++)
                                 {
-                                    // 將 Match 內所有值的集合傳給 GroupCollection groups
-                                    GroupCollection gps = mat.Groups;
-                                    // 印出 Group 內 word 值
-                                    for (int m = 0; m < gps.Count; m++)
-                                    {
-                                        lol += /*++index + "<:> " + */gps[s].Value.Trim() + " [lol]\n  ";/* + " [" + cl.ToString() + "]"*/
-                                    }
-                                    if (cl > 5)
-                                    {
-                                        tmp[cl] = gps[0].Value.Trim();
-                                        cl = 0;
-                                        ret.Rows.Add(tmp);
-                                        tmp = ret.NewRow();
-                                        //lol += "\n";
-                                    }
-                                    else
-                                    {
-                                        tmp[cl] = gps[0].Value.Trim();
-                                        cl++;
-                                        //lol += "\t\t";
-                                    }
+                                    lol += /*++index + "<:> " + */gps[s].Value.Trim() + " [lol]\n  ";/* + " [" + cl.ToString() + "]"*/
+                                }
+                                if (cl > 5)
+                                {
+                                    tmp[cl] = gps[0].Value.Trim();
+                                    cl = 0;
+                                    ret.Rows.Add(tmp);
+                                    tmp = ret.NewRow();
+                                    //lol += "\n";
+                                }
+                                else
+                                {
+                                    tmp[cl] = gps[0].Value.Trim();
+                                    cl++;
+                                    //lol += "\t\t";
                                 }
                             }
-                            else cl = 0;
                         }
-                        //lol += "\nkai?\n ";
+                        else cl = 0;
                     }
-                    //                        else lol += "\non9\n";
+                    //lol += "\nkai?\n ";
                 }
+                //                        else lol += "\non9\n";
+            }
             //   dgv2.DataSource = ret;
             #endregion
             return ret;
@@ -201,17 +204,17 @@ namespace StockMaximumGain.classes
             double price = 0;
             int share = 0;
             string name = "";
-            string threeROllrl = "https://www.hkex.com.hk/eng/invest/company/quote_page_e.asp?WidCoID=" + no;          
+            string threeROllrl = "https://www.hkex.com.hk/eng/invest/company/quote_page_e.asp?WidCoID=" + no;
             WebRequest request = HttpWebRequest.Create(threeROllrl);
-        /*    request.Method = "POST";
+            /*    request.Method = "POST";
 
-            string data = "symbol=" + no; //replace <value>
-            byte[] dataStream = Encoding.UTF8.GetBytes(data);
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.ContentLength = dataStream.Length;  
-            Stream newStream = request.GetRequestStream();           
-            newStream.Write(dataStream, 0, dataStream.Length);
-            newStream.Close();*/            
+                string data = "symbol=" + no; //replace <value>
+                byte[] dataStream = Encoding.UTF8.GetBytes(data);
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = dataStream.Length;  
+                Stream newStream = request.GetRequestStream();           
+                newStream.Write(dataStream, 0, dataStream.Length);
+                newStream.Close();*/
             WebResponse response = request.GetResponse();
             StreamReader vr = new StreamReader(response.GetResponseStream());
             string result = vr.ReadToEnd();
@@ -220,32 +223,32 @@ namespace StockMaximumGain.classes
             Regex regex;
             MatchCollection matches;
             string lol = "";
-          /*  string pattern = "(?<=調整後的收市價\\*.*?</th></tr>).*?(?=\\* <small>收市價已按股息和拆細而調整)";//god append     
-            //            <ul class="UL1"><li class="LI2 font28 C bold W1"><span class="pos bold">3.930</span></li></ul>
+            /*  string pattern = "(?<=調整後的收市價\\*.*?</th></tr>).*?(?=\\* <small>收市價已按股息和拆細而調整)";//god append     
+              //            <ul class="UL1"><li class="LI2 font28 C bold W1"><span class="pos bold">3.930</span></li></ul>
 
-            pattern = "(?<=<ul class=\"UL1\"><li class=\"LI2 font28 C bold W1\"><span class=\".*? bold\">).*?(?=</span></li></ul>)";//god append  
-            Regex regex = new Regex(pattern, RegexOptions.IgnoreCase); // 宣告 Regex 忽略大小寫
-            MatchCollection matches = regex.Matches(result); // 將比對後集合傳給 MatchCollection
-            string lol = "";
-            try
-            {
-                #region reinitialization
-                #endregion
-                foreach (Match match in matches) // 一一取出 MatchCollection 內容
-                {
-                    // 將 Match 內所有值的集合傳給 GroupCollection groups
-                    GroupCollection groups = match.Groups;
-                    // 印出 Group 內 word 值
-                    for (int s = 0; s < groups.Count; s++)
-                        lol += groups[s].Value.Trim();
-                    price = Convert.ToDouble(lol);
-                }
-                // return new srcStock(11,0,"error");
-            }
-            catch (Exception ex)
-            {
-                //return new srcStock(11,0,"error");
-            }*/
+              pattern = "(?<=<ul class=\"UL1\"><li class=\"LI2 font28 C bold W1\"><span class=\".*? bold\">).*?(?=</span></li></ul>)";//god append  
+              Regex regex = new Regex(pattern, RegexOptions.IgnoreCase); // 宣告 Regex 忽略大小寫
+              MatchCollection matches = regex.Matches(result); // 將比對後集合傳給 MatchCollection
+              string lol = "";
+              try
+              {
+                  #region reinitialization
+                  #endregion
+                  foreach (Match match in matches) // 一一取出 MatchCollection 內容
+                  {
+                      // 將 Match 內所有值的集合傳給 GroupCollection groups
+                      GroupCollection groups = match.Groups;
+                      // 印出 Group 內 word 值
+                      for (int s = 0; s < groups.Count; s++)
+                          lol += groups[s].Value.Trim();
+                      price = Convert.ToDouble(lol);
+                  }
+                  // return new srcStock(11,0,"error");
+              }
+              catch (Exception ex)
+              {
+                  //return new srcStock(11,0,"error");
+              }*/
             //.{0,600}?
             pattern = "(?<=width=\"61\"><font face=\"Verdana, Arial, Helvetica, sans-serif\" size=\"2\">).*?(?=</font></td>)";//god append              
             regex = new Regex(pattern, RegexOptions.IgnoreCase); // 宣告 Regex 忽略大小寫
@@ -263,7 +266,7 @@ namespace StockMaximumGain.classes
                         GroupCollection groups = match.Groups;
                         // 印出 Group 內 word 值
                         for (int s = 0; s < groups.Count; s++)
-                            lol = groups[s].Value.Trim().Replace(",","");
+                            lol = groups[s].Value.Trim().Replace(",", "");
                         share = Convert.ToInt32(lol);
                     }
                     catch (Exception ex)

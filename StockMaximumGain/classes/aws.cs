@@ -6,6 +6,9 @@ using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using System.IO;
+using System.Threading;
+using Amazon.DynamoDBv2.Model;
+
 namespace StockMaximumGain.classes
 {
     public class Vp
@@ -21,41 +24,72 @@ namespace StockMaximumGain.classes
 
     public class aws
     {
-        AmazonDynamoDBClient client = new AmazonDynamoDBClient();
+        public static string TABLENAME_ESQZ = "esqz";
+        AmazonDynamoDBClient client = new AmazonDynamoDBClient("AKIAJRUN6VRYCLL2M7IQ", "MEDn8TjDqTUt1imxrBLPaua+nIntPO6ze2Jvqxh1");
         Table table;
-       // Table table2;
+        // Table table2;
         public aws()
         {
-            table = Table.LoadTable(client, "esqz");
-          //  table2 = Table.LoadTable(client, "oneitest");
+            table = Table.LoadTable(client, TABLENAME_ESQZ);
+            //  table2 = Table.LoadTable(client, "oneitest");
         }
         public Document getItem(int id, GetItemOperationConfig c)
         {
             return table.GetItem(id);
         }
-   /*     public Document getItem2(int id,GetItemOperationConfig c)
+        /*     public Document getItem2(int id,GetItemOperationConfig c)
+             {
+                 return table2.GetItem(id);
+             }
+             public void pullToAWS2(int id, List<Vp> sp)
+             {
+                 Document chainStore2 = new Document();
+                 chainStore2["id"] = id;
+                 foreach (Vp vp in sp)
+                 {
+                     chainStore2[vp.name] = vp.value;
+                 }
+                 table2.PutItem(chainStore2);
+             }*/
+        public void pullToAWS_ezstockquote(StockMaximumGain.enter me, int sn, List<Vp> sp)
         {
-            return table2.GetItem(id);
-        }
-        public void pullToAWS2(int id, List<Vp> sp)
-        {
-            Document chainStore2 = new Document();
-            chainStore2["id"] = id;
-            foreach (Vp vp in sp)
+            var request = new GetItemRequest
             {
-                chainStore2[vp.name] = vp.value;
-            }
-            table2.PutItem(chainStore2);
-        }*/
-        public void pullToAWS_ezstockquote(int sn, List<Vp> sp)
-        {
-            Document chainStore2 = new Document();
-            chainStore2["sn"] = sn;
-            foreach (Vp vp in sp)
+                TableName = TABLENAME_ESQZ,
+                Key = new Dictionary<string, AttributeValue>() { { "sn", new AttributeValue { N = sn.ToString() } } },
+            };
+            var response = client.GetItem(request);
+            // Check the response.
+            var result = response.Item;
+            //            var attributeMap = result.Item; // Attribute list in the response.
+
+            Boolean jdi = false;
+            if (result != null)
             {
-                chainStore2[vp.name] = vp.value;
+                AttributeValue value = result.FirstOrDefault(x => x.Key.Equals("sph")).Value;
+                if (!value.N.Equals(sp.FirstOrDefault(x => x.name.Equals("sph")).value.ToString()))
+                {
+                    jdi = true;
+                }
             }
-            table.PutItem(chainStore2);
+            else
+            {
+                jdi = true;
+            }
+            if (jdi)
+            {
+                Document chainStore2 = new Document();
+                chainStore2["sn"] = sn;
+                foreach (Vp vp in sp)
+                {
+                    chainStore2[vp.name] = vp.value;
+                }
+                table.PutItem(chainStore2);
+                for (int p = 20; p > 0; p--) {
+                    me.writeToTextbox(p.ToString());
+                    Thread.Sleep(1000);
+                }
+            }
         }
         public void pullToAWS(int sn, int sph)
         {
@@ -66,15 +100,15 @@ namespace StockMaximumGain.classes
         }
         public string startLine()
         {
-//            Table table = Table.LoadTable(client, "esqz");
-            String ret = "";             
+            //            Table table = Table.LoadTable(client, "esqz");
+            String ret = "";
             try
             {   // Open the text file using a stream reader.
                 using (StreamReader sr = new StreamReader(@"C:\Users\sam.mak\Documents\Visual Studio 2010\Projects\StockMaximumGain\StockMaximumGain\StockMaximumGain\snsph.txt"))
                 {
                     string line = "";
                     while ((line = sr.ReadLine()) != null)
-                    {                       
+                    {
                         if (!line.Equals(""))
                         {
                             int sn = -1;
