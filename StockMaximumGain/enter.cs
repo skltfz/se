@@ -93,7 +93,7 @@ namespace StockMaximumGain
         }
         private void enter_Load(object sender, EventArgs e)
         {
-          //  bg_Init.RunWorkerAsync();
+            bg_Init.RunWorkerAsync();
             /*  string x = "Kang Chen <Kang.Chen@wesoft.com>; Kyle Yu <kyle.yu@wesoft.com>; James Li <james.li@wesoft.com>; Kitty Wu <kitty.wu@wesoft.com>; Niya Lu <niya.lu@wesoft.com>";
               string pattern = "(?<=<).*?(?=>)";               
               Regex regex = new Regex(pattern, RegexOptions.IgnoreCase); 

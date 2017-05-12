@@ -25,13 +25,22 @@ namespace StockMaximumGain.classes
     public class aws
     {
         public static string TABLENAME_ESQZ = "esqz";
-        AmazonDynamoDBClient client = new AmazonDynamoDBClient("AKIAJRUN6VRYCLL2M7IQ", "MEDn8TjDqTUt1imxrBLPaua+nIntPO6ze2Jvqxh1");
+        AmazonDynamoDBClient client;// = new AmazonDynamoDBClient("AKIAJXW7T7AOQWMNUYTQ", "BZdRKiv7fvuF/f0+PbsP4D2Zyo4PpFfshBTi42S6");
         Table table;
         // Table table2;
         public aws()
         {
-            table = Table.LoadTable(client, TABLENAME_ESQZ);
-            //  table2 = Table.LoadTable(client, "oneitest");
+            try
+            {
+//                client = new AmazonDynamoDBClient("AKIAJXW7T7AOQWMNUYTQ", "BZdRKiv7fvuF/f0+PbsP4D2Zyo4PpFfshBTi42S6");
+                client = new AmazonDynamoDBClient();
+                table = Table.LoadTable(client, TABLENAME_ESQZ);
+                //  table2 = Table.LoadTable(client, "oneitest");
+            }
+            catch(Exception ex)
+            {
+
+            }
         }
         public Document getItem(int id, GetItemOperationConfig c)
         {
