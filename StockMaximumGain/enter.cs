@@ -1147,11 +1147,11 @@ namespace StockMaximumGain
                     System.Diagnostics.Process.Start("http://corpsv.etnet.com.hk/webservice/jsp/ETNET/DIV-ANNOUNCE/BIG5/SearchResult.jsp?SORT=CODE&TO=" + dateto + "&ENCODING=BIG5&ANNOUNCETYPE=D&STOCKCODE=" + g.Value.ToString() + "&MAINTYPE=DIVANNOUNCE&FROM=" + datefrom + "&INDUSTRY=&SUBTYPE=SEARCH&CLIENT=ETNET");
                     System.Diagnostics.Process.Start("http://www.aastocks.com/tc/stock/detailchart.aspx?symbol=" + g.Value.ToString() + "#GTop");
                     /*                        }
-                                            else
-                                            {
-                                                stockremarks sr = new stockremarks(Convert.ToInt32(g.Value.ToString()));
-                                                sr.Show();
-                                            }*/
+                    else
+                    {
+                        stockremarks sr = new stockremarks(Convert.ToInt32(g.Value.ToString()));
+                        sr.Show();
+                    }*/
                 }
             }
         }
